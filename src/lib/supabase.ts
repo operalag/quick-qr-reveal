@@ -24,6 +24,7 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
 
     if (existingData) {
       console.log('Existing data found:', existingData)
+      
       // QR code exists, update the stamp_count
       // Make sure to convert to number explicitly
       const currentStampCount = typeof existingData.stamp_count === 'number' ? existingData.stamp_count : 0
@@ -32,14 +33,31 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
       console.log('Current stamp count:', currentStampCount)
       console.log('New stamp count:', newStampCount)
       
+      // Update with the new timestamp to prevent any caching issues
       const { error: updateError } = await supabase
         .from('customers')
-        .update({ stamp_count: newStampCount })
+        .update({ 
+          stamp_count: newStampCount,
+          updated_at: new Date().toISOString()
+        })
         .eq('qr_code', qrCode)
 
       if (updateError) {
         console.error('Error updating stamp count:', updateError)
         return { success: false, error: updateError.message }
+      }
+      
+      // Verify the update by fetching the record again
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('qr_code', qrCode)
+        .single()
+        
+      if (verifyError) {
+        console.error('Error verifying update:', verifyError)
+      } else {
+        console.log('Verified data after update:', verifyData)
       }
 
       return { 
