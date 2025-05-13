@@ -8,7 +8,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Function to add a QR code scan to the customers table or update stamp count if already exists
-export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean; error?: string }> {
+export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean; error?: string; message?: string }> {
   try {
     // First, check if the QR code already exists
     const { data: existingData, error: fetchError } = await supabase
