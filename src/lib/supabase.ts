@@ -30,8 +30,7 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
       const { error: updateError } = await supabase
         .from('customers')
         .update({ 
-          stamp_count: newStampCount,
-          last_scanned_at: new Date().toISOString() 
+          stamp_count: newStampCount
         })
         .eq('qr_code', qrCode)
 
@@ -50,9 +49,7 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
         .from('customers')
         .insert([{ 
           qr_code: qrCode, 
-          stamp_count: 1,
-          first_scanned_at: new Date().toISOString(),
-          last_scanned_at: new Date().toISOString()
+          stamp_count: 1
         }])
 
       if (insertError) {
