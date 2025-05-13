@@ -16,8 +16,8 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
   const handleScan = (data: { text: string } | null) => {
     if (data?.text) {
       toast({
-        title: "QR Code Detected",
-        description: "Processing scan result...",
+        title: "QR-Code Erkannt",
+        description: "Scan-Ergebnis wird verarbeitet...",
       });
       onScanSuccess(data.text);
     }
@@ -25,7 +25,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
 
   const handleError = (err: Error) => {
     console.error("QR Scanner error:", err);
-    setError("Camera access error. Please check permissions and try again.");
+    setError("Kamerazugriffsfehler. Bitte überprüfen Sie die Berechtigungen und versuchen Sie es erneut.");
   };
 
   return (
@@ -56,7 +56,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
       <div className="text-center text-sm text-gray-600">
         <div className="flex items-center justify-center mb-2">
           <Scan className="mr-2 h-4 w-4" />
-          <span>Position QR code within the frame</span>
+          <span>QR-Code im Rahmen positionieren</span>
         </div>
       </div>
 

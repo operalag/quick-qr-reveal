@@ -37,23 +37,23 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
       
       if (response.success) {
         toast({
-          title: "Stamp Added Successfully",
-          description: response.message || "QR code has been stamped",
+          title: "Stempel Erfolgreich Hinzugefügt",
+          description: response.message || "QR-Code wurde gestempelt",
           variant: "default",
         });
-        setStampMessage(response.message || "Stamp recorded");
+        setStampMessage(response.message || "Stempel registriert");
         onStampComplete(); // Notify parent component that stamp is complete
       } else {
         toast({
-          title: "Error",
-          description: response.error || "Failed to stamp QR code",
+          title: "Fehler",
+          description: response.error || "Stempeln des QR-Codes fehlgeschlagen",
           variant: "destructive",
         });
       }
     } catch (err) {
       toast({
-        title: "Error",
-        description: "Something went wrong while stamping",
+        title: "Fehler",
+        description: "Beim Stempeln ist ein Fehler aufgetreten",
         variant: "destructive",
       });
       console.error(err);
@@ -68,7 +68,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
         <div className="bg-green-100 rounded-full p-2 mr-3">
           <Check className="h-6 w-6 text-green-600" />
         </div>
-        <span className="text-green-800 font-medium">Scan Successful</span>
+        <span className="text-green-800 font-medium">Scan Erfolgreich</span>
       </div>
 
       <Card>
@@ -85,7 +85,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">QR Content:</h3>
+              <h3 className="text-sm font-medium text-gray-500 mb-1">QR-Inhalt:</h3>
               <div className="p-3 bg-gray-50 rounded-md break-all">
                 {isUrl(result) ? (
                   <a 
@@ -113,7 +113,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
                 variant="outline"
                 onClick={() => window.location.reload()}
               >
-                Scan Again
+                Erneut Scannen
               </Button>
               <Button 
                 onClick={handleStamp}
@@ -121,7 +121,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
                 className={`flex items-center gap-2 ${isStamped ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}
               >
                 <Stamp className="h-4 w-4" />
-                {isStamping ? "Stamping..." : isStamped ? "Stamped" : "Stamp"}
+                {isStamping ? "Stempeln..." : isStamped ? "Gestempelt" : "Stempeln"}
               </Button>
             </div>
           </div>
