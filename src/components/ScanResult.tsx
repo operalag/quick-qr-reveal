@@ -34,12 +34,15 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
     setStampMessage(null);
     
     try {
+      console.log('Sending QR code to be stamped:', result);
       const response = await addQrCodeScan(result);
+      console.log('Stamp response:', response);
       
       if (response.success) {
         // Extract the stamp count from response message
         const stampCountMatch = response.message?.match(/(\d+)$/);
-        const newStampCount = stampCountMatch ? parseInt(stampCountMatch[1]) : null;
+        const newStampCount = stampCountMatch ? parseInt(stampCountMatch[1]) : 1;
+        console.log('Extracted stamp count:', newStampCount);
         setCurrentStampCount(newStampCount);
         
         // Create German message
@@ -63,12 +66,12 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
         });
       }
     } catch (err) {
+      console.error('Error during stamping:', err);
       toast({
         title: "Fehler",
         description: "Beim Stempeln ist ein Fehler aufgetreten",
         variant: "destructive",
       });
-      console.error(err);
     } finally {
       setIsStamping(false);
     }

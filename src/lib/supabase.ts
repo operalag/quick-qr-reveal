@@ -23,15 +23,18 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
     }
 
     if (existingData) {
+      console.log('Existing data found:', existingData)
       // QR code exists, update the stamp_count
-      const currentStampCount = existingData.stamp_count || 0
+      // Make sure to convert to number explicitly
+      const currentStampCount = typeof existingData.stamp_count === 'number' ? existingData.stamp_count : 0
       const newStampCount = currentStampCount + 1
+      
+      console.log('Current stamp count:', currentStampCount)
+      console.log('New stamp count:', newStampCount)
       
       const { error: updateError } = await supabase
         .from('customers')
-        .update({ 
-          stamp_count: newStampCount
-        })
+        .update({ stamp_count: newStampCount })
         .eq('qr_code', qrCode)
 
       if (updateError) {
@@ -44,6 +47,7 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
         message: `Stamp count increased to ${newStampCount}` 
       }
     } else {
+      console.log('No existing data, creating new record')
       // QR code doesn't exist, insert a new record
       const { error: insertError } = await supabase
         .from('customers')
