@@ -14,6 +14,7 @@ interface ScanResultProps {
 const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
   const { toast } = useToast();
   const [isStamping, setIsStamping] = useState(false);
+  const [stampMessage, setStampMessage] = useState<string | null>(null);
 
   // Check if the result is a URL
   const isUrl = (str: string) => {
@@ -27,20 +28,22 @@ const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
 
   const handleStamp = async () => {
     setIsStamping(true);
+    setStampMessage(null);
     
     try {
-      const { success, error } = await addQrCodeScan(result);
+      const response = await addQrCodeScan(result);
       
-      if (success) {
+      if (response.success) {
         toast({
-          title: "Success!",
-          description: "QR code has been stamped in the database",
+          title: "Stamp Added Successfully",
+          description: response.message || "QR code has been stamped",
           variant: "default",
         });
+        setStampMessage(response.message || "Stamp recorded");
       } else {
         toast({
           title: "Error",
-          description: error || "Failed to stamp QR code",
+          description: response.error || "Failed to stamp QR code",
           variant: "destructive",
         });
       }
@@ -95,6 +98,12 @@ const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
                 )}
               </div>
             </div>
+            
+            {stampMessage && (
+              <div className="bg-blue-50 p-3 rounded-md text-blue-800 text-center font-medium">
+                {stampMessage}
+              </div>
+            )}
             
             <div className="flex justify-center space-x-3 pt-2">
               <Button 

@@ -7,21 +7,66 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Function to add a QR code scan to the customers table
+// Function to add a QR code scan to the customers table or update stamp count if already exists
 export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase
+    // First, check if the QR code already exists
+    const { data: existingData, error: fetchError } = await supabase
       .from('customers')
-      .insert([{ qr_code: qrCode, scanned_at: new Date().toISOString() }])
+      .select('*')
+      .eq('qr_code', qrCode)
+      .single()
 
-    if (error) {
-      console.error('Error adding QR scan to database:', error)
-      return { success: false, error: error.message }
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows returned
+      console.error('Error checking for existing QR code:', fetchError)
+      return { success: false, error: fetchError.message }
     }
 
-    return { success: true }
+    if (existingData) {
+      // QR code exists, update the stamp_count
+      const currentStampCount = existingData.stamp_count || 0
+      const newStampCount = currentStampCount + 1
+      
+      const { error: updateError } = await supabase
+        .from('customers')
+        .update({ 
+          stamp_count: newStampCount,
+          last_scanned_at: new Date().toISOString() 
+        })
+        .eq('qr_code', qrCode)
+
+      if (updateError) {
+        console.error('Error updating stamp count:', updateError)
+        return { success: false, error: updateError.message }
+      }
+
+      return { 
+        success: true, 
+        message: `Stamp count increased to ${newStampCount}` 
+      }
+    } else {
+      // QR code doesn't exist, insert a new record
+      const { error: insertError } = await supabase
+        .from('customers')
+        .insert([{ 
+          qr_code: qrCode, 
+          stamp_count: 1,
+          first_scanned_at: new Date().toISOString(),
+          last_scanned_at: new Date().toISOString()
+        }])
+
+      if (insertError) {
+        console.error('Error adding new QR scan to database:', insertError)
+        return { success: false, error: insertError.message }
+      }
+
+      return { 
+        success: true,
+        message: 'First stamp recorded' 
+      }
+    }
   } catch (err) {
-    console.error('Unexpected error adding QR scan:', err)
+    console.error('Unexpected error processing QR scan:', err)
     return { 
       success: false, 
       error: err instanceof Error ? err.message : 'Unknown error occurred' 
