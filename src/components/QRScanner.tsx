@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import QrReader from "react-qr-scanner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Scan, ScanX } from "lucide-react";
+import { Scan } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface QRScannerProps {
@@ -62,7 +62,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
 
       {error && (
         <Alert variant="destructive">
-          <ScanX className="h-4 w-4 mr-2" />
+          <Scan className="h-4 w-4 mr-2" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
