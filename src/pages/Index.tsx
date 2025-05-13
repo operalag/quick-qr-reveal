@@ -37,17 +37,17 @@ const Index = () => {
               ) : (
                 <div className="text-center text-gray-600 py-8">
                   <p>Press the button below to scan a QR code</p>
+                  
+                  <div className="flex justify-center mt-4">
+                    <Button 
+                      onClick={handleStartScan}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-full transition-all"
+                    >
+                      Start Scanning
+                    </Button>
+                  </div>
                 </div>
               )}
-              
-              <div className="flex justify-center">
-                <Button 
-                  onClick={handleStartScan}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-full transition-all"
-                >
-                  {scanResult ? "Scan Again" : "Start Scanning"}
-                </Button>
-              </div>
             </div>
           )}
         </CardContent>

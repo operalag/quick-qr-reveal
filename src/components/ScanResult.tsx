@@ -1,14 +1,20 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Check, Stamp } from "lucide-react";
 import QRCode from "react-qr-code";
+import { Button } from "@/components/ui/button";
+import { addQrCodeScan } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 interface ScanResultProps {
   result: string;
 }
 
 const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
+  const { toast } = useToast();
+  const [isStamping, setIsStamping] = useState(false);
+
   // Check if the result is a URL
   const isUrl = (str: string) => {
     try {
@@ -16,6 +22,37 @@ const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
       return true;
     } catch {
       return false;
+    }
+  };
+
+  const handleStamp = async () => {
+    setIsStamping(true);
+    
+    try {
+      const { success, error } = await addQrCodeScan(result);
+      
+      if (success) {
+        toast({
+          title: "Success!",
+          description: "QR code has been stamped in the database",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error || "Failed to stamp QR code",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Something went wrong while stamping",
+        variant: "destructive",
+      });
+      console.error(err);
+    } finally {
+      setIsStamping(false);
     }
   };
 
@@ -57,6 +94,23 @@ const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
                   <p className="text-gray-800">{result}</p>
                 )}
               </div>
+            </div>
+            
+            <div className="flex justify-center space-x-3 pt-2">
+              <Button 
+                variant="outline"
+                onClick={() => window.location.reload()}
+              >
+                Scan Again
+              </Button>
+              <Button 
+                onClick={handleStamp}
+                disabled={isStamping}
+                className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+              >
+                <Stamp className="h-4 w-4" />
+                {isStamping ? "Stamping..." : "Stamp"}
+              </Button>
             </div>
           </div>
         </CardContent>
