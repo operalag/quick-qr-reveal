@@ -17,6 +17,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
   const { toast } = useToast();
   const [isStamping, setIsStamping] = useState(false);
   const [stampMessage, setStampMessage] = useState<string | null>(null);
+  const [currentStampCount, setCurrentStampCount] = useState<number | null>(null);
 
   // Check if the result is a URL
   const isUrl = (str: string) => {
@@ -36,12 +37,23 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
       const response = await addQrCodeScan(result);
       
       if (response.success) {
+        // Extract the stamp count from response message
+        const stampCountMatch = response.message?.match(/(\d+)$/);
+        const newStampCount = stampCountMatch ? parseInt(stampCountMatch[1]) : null;
+        setCurrentStampCount(newStampCount);
+        
+        // Create German message
+        let germanMessage = "Erster Stempel registriert";
+        if (newStampCount && newStampCount > 1) {
+          germanMessage = `Stempelanzahl erhöht auf ${newStampCount}`;
+        }
+        
         toast({
           title: "Stempel Erfolgreich Hinzugefügt",
-          description: response.message || "QR-Code wurde gestempelt",
+          description: germanMessage,
           variant: "default",
         });
-        setStampMessage(response.message || "Stempel registriert");
+        setStampMessage(germanMessage);
         onStampComplete(); // Notify parent component that stamp is complete
       } else {
         toast({
@@ -105,6 +117,11 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
             {stampMessage && (
               <div className="bg-blue-50 p-3 rounded-md text-blue-800 text-center font-medium">
                 {stampMessage}
+                {currentStampCount && (
+                  <div className="mt-2 font-bold text-lg">
+                    Aktuelle Stempelanzahl: {currentStampCount}
+                  </div>
+                )}
               </div>
             )}
             
