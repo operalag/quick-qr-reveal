@@ -8,17 +8,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const Index = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [isStamped, setIsStamped] = useState(false);
 
   const handleScan = (result: string) => {
     if (result) {
       setScanResult(result);
       setIsScanning(false);
+      setIsStamped(false); // Reset stamped state on new scan
     }
   };
 
   const handleStartScan = () => {
     setScanResult(null);
     setIsScanning(true);
+    setIsStamped(false);
+  };
+
+  const handleStampComplete = () => {
+    setIsStamped(true);
   };
 
   return (
@@ -33,7 +40,11 @@ const Index = () => {
           ) : (
             <div className="space-y-6">
               {scanResult ? (
-                <ScanResult result={scanResult} />
+                <ScanResult 
+                  result={scanResult} 
+                  isStamped={isStamped} 
+                  onStampComplete={handleStampComplete}
+                />
               ) : (
                 <div className="text-center text-gray-600 py-8">
                   <p>Press the button below to scan a QR code</p>

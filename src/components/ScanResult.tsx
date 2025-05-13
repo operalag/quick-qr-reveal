@@ -9,9 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 
 interface ScanResultProps {
   result: string;
+  isStamped: boolean;
+  onStampComplete: () => void;
 }
 
-const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
+const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampComplete }) => {
   const { toast } = useToast();
   const [isStamping, setIsStamping] = useState(false);
   const [stampMessage, setStampMessage] = useState<string | null>(null);
@@ -40,6 +42,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
           variant: "default",
         });
         setStampMessage(response.message || "Stamp recorded");
+        onStampComplete(); // Notify parent component that stamp is complete
       } else {
         toast({
           title: "Error",
@@ -114,11 +117,11 @@ const ScanResult: React.FC<ScanResultProps> = ({ result }) => {
               </Button>
               <Button 
                 onClick={handleStamp}
-                disabled={isStamping}
-                className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+                disabled={isStamping || isStamped}
+                className={`flex items-center gap-2 ${isStamped ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}
               >
                 <Stamp className="h-4 w-4" />
-                {isStamping ? "Stamping..." : "Stamp"}
+                {isStamping ? "Stamping..." : isStamped ? "Stamped" : "Stamp"}
               </Button>
             </div>
           </div>
