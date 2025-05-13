@@ -31,7 +31,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="text-center bg-blue-600 text-white rounded-t-lg relative overflow-hidden">
+        <CardHeader className="text-center bg-[#003180] text-white rounded-t-lg relative overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center">
             <img 
               src="/lovable-uploads/7d9258b3-9336-40bb-a829-6b75d7b35ff3.png" 
@@ -58,7 +58,7 @@ const Index = () => {
                   <div className="flex justify-center mt-4">
                     <Button 
                       onClick={handleStartScan}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-full transition-all"
+                      className="bg-[#003180] hover:bg-[#00296b] text-white px-8 py-2 rounded-full transition-all"
                     >
                       Scannen Starten
                     </Button>

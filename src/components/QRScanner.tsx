@@ -32,11 +32,11 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
     <div className="space-y-4">
       <div className="rounded-lg overflow-hidden relative">
         {/* Scanner frame overlay */}
-        <div className="absolute inset-0 border-2 border-blue-400 rounded-lg z-10 pointer-events-none">
-          <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-blue-500 rounded-tl-lg"></div>
-          <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-blue-500 rounded-tr-lg"></div>
-          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-blue-500 rounded-bl-lg"></div>
-          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-blue-500 rounded-br-lg"></div>
+        <div className="absolute inset-0 border-2 border-[#003180] rounded-lg z-10 pointer-events-none">
+          <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-[#003180] rounded-tl-lg"></div>
+          <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-[#003180] rounded-tr-lg"></div>
+          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-[#003180] rounded-bl-lg"></div>
+          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-[#003180] rounded-br-lg"></div>
         </div>
         
         <div className="flex justify-center items-center">
