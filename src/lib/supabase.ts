@@ -8,7 +8,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Maximum allowed stamp count based on the constraint in the database
-const MAX_STAMP_COUNT = 6;
+const MAX_STAMP_COUNT = 5;
 
 // Function to add a QR code scan to the customers table or update stamp count if already exists
 export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean; error?: string; message?: string; maxReached?: boolean; currentCount?: number }> {
@@ -37,23 +37,31 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
           success: true, 
           maxReached: true,
           currentCount: currentStampCount,
-          message: `Maximale Stempelanzahl von ${MAX_STAMP_COUNT} bereits erreicht!`
+          message: `Stempelkarte ist voll!`
         }
       }
       
       // Calculate new stamp count, ensuring it doesn't exceed the maximum
       const newStampCount = Math.min(currentStampCount + 1, MAX_STAMP_COUNT)
+      const isMaxReached = newStampCount >= MAX_STAMP_COUNT
       
       console.log('Current stamp count:', currentStampCount)
       console.log('New stamp count:', newStampCount)
       
       // Update with the new timestamp to prevent any caching issues
+      const updateData: any = { 
+        stamp_count: newStampCount,
+        updated_at: new Date().toISOString()
+      }
+      
+      // If we're reaching the maximum, update the goodie_status as well
+      if (isMaxReached) {
+        updateData.goodie_status = existingData.goodie_status + 1;
+      }
+      
       const { error: updateError } = await supabase
         .from('customers')
-        .update({ 
-          stamp_count: newStampCount,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('qr_code', qrCode)
 
       if (updateError) {
@@ -74,13 +82,12 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
         console.log('Verified data after update:', verifyData)
       }
 
-      const isMaxReached = newStampCount >= MAX_STAMP_COUNT;
       return { 
         success: true,
         currentCount: newStampCount,
         maxReached: isMaxReached,
         message: isMaxReached 
-          ? `Maximale Stempelanzahl von ${MAX_STAMP_COUNT} erreicht!` 
+          ? `Stempelkarte ist voll!` 
           : `Stempelanzahl erhöht auf ${newStampCount}` 
       }
     } else {
@@ -90,7 +97,8 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
         .from('customers')
         .insert([{ 
           qr_code: qrCode, 
-          stamp_count: 1
+          stamp_count: 1,
+          goodie_status: 0
         }])
 
       if (insertError) {

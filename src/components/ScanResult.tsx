@@ -86,6 +86,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
               <div className="bg-amber-50 p-3 rounded-md text-amber-800 text-center font-medium">
                 <Award className="h-5 w-5 mx-auto mb-1" />
                 <div>Stempelkarte ist voll!</div>
+                <div className="text-amber-600 font-bold mt-1">BONUS verfügbar</div>
               </div>
             )}
             
