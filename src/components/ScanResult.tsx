@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, Stamp, Award } from "lucide-react";
+import { Check, Stamp, Award, PartyPopper } from "lucide-react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { addQrCodeScan } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import confetti from 'canvas-confetti';
 
 interface ScanResultProps {
   result: string;
@@ -18,6 +19,14 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
   const [isStamping, setIsStamping] = useState(false);
   const [maxReached, setMaxReached] = useState(false);
 
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
   const handleStamp = async () => {
     setIsStamping(true);
     
@@ -29,16 +38,24 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
       if (response.success) {
         if (response.maxReached) {
           setMaxReached(true);
+          
+          // Trigger confetti effect when max stamps reached
+          triggerConfetti();
+          
+          // Custom message for bonus available
+          toast({
+            title: "Stempelkarte Voll",
+            description: "BONUS verfügbar!",
+            variant: "default",
+          });
+        } else {
+          // Regular success toast
+          toast({
+            title: "Stempel Erfolgreich Hinzugefügt",
+            description: response.message || "Stempel registriert",
+            variant: "default",
+          });
         }
-        
-        // Set the message from the response for the toast only
-        const message = response.message || "Stempel registriert";
-        
-        toast({
-          title: response.maxReached ? "Stempelkarte Voll" : "Stempel Erfolgreich Hinzugefügt",
-          description: message,
-          variant: "default",
-        });
         
         onStampComplete(); // Notify parent component that stamp is complete
       } else {
@@ -84,8 +101,11 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
             
             {maxReached && (
               <div className="bg-amber-50 p-3 rounded-md text-amber-800 text-center font-medium">
-                <Award className="h-5 w-5 mx-auto mb-1" />
-                <div>Stempelkarte ist voll!</div>
+                <div className="flex flex-col items-center">
+                  <PartyPopper className="h-6 w-6 mx-auto mb-1 text-amber-600" />
+                  <div>Stempelkarte ist voll!</div>
+                  <div className="text-green-600 font-bold mt-1">BONUS verfügbar</div>
+                </div>
               </div>
             )}
             

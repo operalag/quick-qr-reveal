@@ -43,18 +43,28 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
       
       // Calculate new stamp count, ensuring it doesn't exceed the maximum
       const newStampCount = Math.min(currentStampCount + 1, MAX_STAMP_COUNT)
-      
       console.log('Current stamp count:', currentStampCount)
       console.log('New stamp count:', newStampCount)
       
-      // Update with the new timestamp to prevent any caching issues
+      // Check if we're reaching the maximum with this update
+      const isMaxReached = newStampCount >= MAX_STAMP_COUNT;
+      
+      // Update with the new timestamp and increment goodie_status if max is reached
+      const updateData: any = { 
+        stamp_count: newStampCount,
+        updated_at: new Date().toISOString()
+      };
+      
+      // If we're reaching the maximum stamps, increment goodie_status
+      if (isMaxReached) {
+        const currentGoodieStatus = existingData.goodie_status || 0;
+        updateData.goodie_status = currentGoodieStatus + 1;
+      }
+      
       const { error: updateError } = await supabase
         .from('customers')
-        .update({ 
-          stamp_count: newStampCount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('qr_code', qrCode)
+        .update(updateData)
+        .eq('qr_code', qrCode);
 
       if (updateError) {
         console.error('Error updating stamp count:', updateError)
@@ -74,14 +84,13 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
         console.log('Verified data after update:', verifyData)
       }
 
-      const isMaxReached = newStampCount >= MAX_STAMP_COUNT;
       return { 
         success: true,
         currentCount: newStampCount,
         maxReached: isMaxReached,
         message: isMaxReached 
           ? `Maximale Stempelanzahl von ${MAX_STAMP_COUNT} erreicht!` 
-          : `Stempelanzahl erhöht auf ${newStampCount}` 
+          : `Stempel erfolgreich hinzugefügt` 
       }
     } else {
       console.log('No existing data, creating new record')
@@ -90,7 +99,8 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
         .from('customers')
         .insert([{ 
           qr_code: qrCode, 
-          stamp_count: 1
+          stamp_count: 1,
+          goodie_status: 0
         }])
 
       if (insertError) {
