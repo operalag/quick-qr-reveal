@@ -15,5 +15,9 @@ if (rootElement) {
   document.documentElement.style.margin = "0";
   document.documentElement.style.padding = "0";
   
+  // Set height to fit content only - optimal for iframe embedding
+  document.body.style.height = "auto";
+  document.documentElement.style.height = "auto";
+  
   createRoot(rootElement).render(<App />);
 }

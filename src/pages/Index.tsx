@@ -29,13 +29,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex items-start justify-center p-0 m-0">
-      <Card className="w-full max-w-md shadow-lg mt-0 mb-0 rounded-none min-h-screen">
-        <CardContent className="p-6">
+    <div className="bg-gradient-to-b from-blue-50 to-blue-100 flex items-start justify-center p-0 m-0">
+      <Card className="w-full max-w-md shadow-lg rounded-none">
+        <CardContent className="py-4 px-4">
           {isScanning ? (
             <QRScanner onScanSuccess={handleScan} />
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {scanResult ? (
                 <ScanResult 
                   result={scanResult} 
@@ -43,13 +43,13 @@ const Index = () => {
                   onStampComplete={handleStampComplete}
                 />
               ) : (
-                <div className="text-center text-gray-600 py-8">
-                  <p>Drücken Sie den Button unten, um einen QR-Code zu scannen</p>
+                <div className="text-center text-gray-600 py-4">
+                  <p className="text-sm">Drücken Sie den Button unten, um einen QR-Code zu scannen</p>
                   
-                  <div className="flex justify-center mt-4">
+                  <div className="flex justify-center mt-3">
                     <Button 
                       onClick={handleStartScan}
-                      className="bg-[#003180] hover:bg-[#00296b] text-white px-8 py-2 rounded-full transition-all"
+                      className="bg-[#003180] hover:bg-[#00296b] text-white px-6 py-1.5 rounded-full transition-all text-sm"
                     >
                       Scannen Starten
                     </Button>
