@@ -7,8 +7,11 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
+// Maximum allowed stamp count based on the constraint in the database
+const MAX_STAMP_COUNT = 5;
+
 // Function to add a QR code scan to the customers table or update stamp count if already exists
-export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean; error?: string; message?: string }> {
+export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean; error?: string; message?: string; maxReached?: boolean; currentCount?: number }> {
   try {
     // First, check if the QR code already exists
     const { data: existingData, error: fetchError } = await supabase
@@ -25,10 +28,21 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
     if (existingData) {
       console.log('Existing data found:', existingData)
       
-      // QR code exists, update the stamp_count
-      // Make sure to convert to number explicitly
+      // QR code exists, check current stamp count
       const currentStampCount = typeof existingData.stamp_count === 'number' ? existingData.stamp_count : 0
-      const newStampCount = currentStampCount + 1
+      
+      // Check if we've already reached the maximum stamps
+      if (currentStampCount >= MAX_STAMP_COUNT) {
+        return { 
+          success: true, 
+          maxReached: true,
+          currentCount: currentStampCount,
+          message: `Maximale Stempelanzahl von ${MAX_STAMP_COUNT} bereits erreicht!`
+        }
+      }
+      
+      // Calculate new stamp count, ensuring it doesn't exceed the maximum
+      const newStampCount = Math.min(currentStampCount + 1, MAX_STAMP_COUNT)
       
       console.log('Current stamp count:', currentStampCount)
       console.log('New stamp count:', newStampCount)
@@ -60,9 +74,14 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
         console.log('Verified data after update:', verifyData)
       }
 
+      const isMaxReached = newStampCount >= MAX_STAMP_COUNT;
       return { 
-        success: true, 
-        message: `Stamp count increased to ${newStampCount}` 
+        success: true,
+        currentCount: newStampCount,
+        maxReached: isMaxReached,
+        message: isMaxReached 
+          ? `Maximale Stempelanzahl von ${MAX_STAMP_COUNT} erreicht!` 
+          : `Stempelanzahl erhöht auf ${newStampCount}` 
       }
     } else {
       console.log('No existing data, creating new record')
@@ -81,7 +100,9 @@ export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean;
 
       return { 
         success: true,
-        message: 'First stamp recorded' 
+        currentCount: 1,
+        maxReached: false,
+        message: 'Erster Stempel registriert' 
       }
     }
   } catch (err) {

@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, Stamp } from "lucide-react";
+import { Check, Stamp, Award } from "lucide-react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { addQrCodeScan } from "@/lib/supabase";
@@ -18,6 +18,7 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
   const [isStamping, setIsStamping] = useState(false);
   const [stampMessage, setStampMessage] = useState<string | null>(null);
   const [currentStampCount, setCurrentStampCount] = useState<number | null>(null);
+  const [maxReached, setMaxReached] = useState(false);
 
   // Check if the result is a URL
   const isUrl = (str: string) => {
@@ -39,24 +40,24 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
       console.log('Stamp response:', response);
       
       if (response.success) {
-        // Extract the stamp count from response message
-        const stampCountMatch = response.message?.match(/(\d+)$/);
-        const newStampCount = stampCountMatch ? parseInt(stampCountMatch[1]) : 1;
-        console.log('Extracted stamp count:', newStampCount);
-        setCurrentStampCount(newStampCount);
-        
-        // Create German message
-        let germanMessage = "Erster Stempel registriert";
-        if (newStampCount && newStampCount > 1) {
-          germanMessage = `Stempelanzahl erhöht auf ${newStampCount}`;
+        if (response.currentCount) {
+          setCurrentStampCount(response.currentCount);
         }
         
+        if (response.maxReached) {
+          setMaxReached(true);
+        }
+        
+        // Set the message from the response
+        const message = response.message || "Stempel registriert";
+        setStampMessage(message);
+        
         toast({
-          title: "Stempel Erfolgreich Hinzugefügt",
-          description: germanMessage,
+          title: response.maxReached ? "Stempelkarte Voll" : "Stempel Erfolgreich Hinzugefügt",
+          description: message,
           variant: "default",
         });
-        setStampMessage(germanMessage);
+        
         onStampComplete(); // Notify parent component that stamp is complete
       } else {
         toast({
@@ -118,9 +119,10 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
             </div>
             
             {stampMessage && (
-              <div className="bg-blue-50 p-3 rounded-md text-blue-800 text-center font-medium">
-                {stampMessage}
-                {currentStampCount && (
+              <div className={`${maxReached ? 'bg-amber-50' : 'bg-blue-50'} p-3 rounded-md ${maxReached ? 'text-amber-800' : 'text-blue-800'} text-center font-medium`}>
+                {maxReached && <Award className="h-5 w-5 mx-auto mb-1" />}
+                <div>{stampMessage}</div>
+                {currentStampCount !== null && (
                   <div className="mt-2 font-bold text-lg">
                     Aktuelle Stempelanzahl: {currentStampCount}
                   </div>
@@ -137,11 +139,11 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
               </Button>
               <Button 
                 onClick={handleStamp}
-                disabled={isStamping || isStamped}
-                className={`flex items-center gap-2 ${isStamped ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}
+                disabled={isStamping || isStamped || maxReached}
+                className={`flex items-center gap-2 ${isStamped || maxReached ? 'bg-gray-400' : 'bg-[#003180] hover:bg-[#002156]'}`}
               >
                 <Stamp className="h-4 w-4" />
-                {isStamping ? "Stempeln..." : isStamped ? "Gestempelt" : "Stempeln"}
+                {isStamping ? "Stempeln..." : maxReached ? "Karte Voll" : isStamped ? "Gestempelt" : "Stempeln"}
               </Button>
             </div>
           </div>
