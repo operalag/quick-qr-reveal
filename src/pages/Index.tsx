@@ -3,7 +3,7 @@ import { useState } from "react";
 import QRScanner from "@/components/QRScanner";
 import ScanResult from "@/components/ScanResult";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
@@ -29,17 +29,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="text-center bg-[#003180] text-white rounded-t-lg relative overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <img 
-              src="/lovable-uploads/7d9258b3-9336-40bb-a829-6b75d7b35ff3.png" 
-              alt="Fürstenberg" 
-              className="h-full object-contain p-1"
-            />
-          </div>
-        </CardHeader>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex items-start justify-center p-0">
+      <Card className="w-full max-w-md shadow-lg mt-0 rounded-none">
         <CardContent className="p-6">
           {isScanning ? (
             <QRScanner onScanSuccess={handleScan} />
