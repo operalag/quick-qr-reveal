@@ -29,8 +29,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex items-start justify-center p-0">
-      <Card className="w-full max-w-md shadow-lg mt-0 rounded-none">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex items-start justify-center p-0 m-0">
+      <Card className="w-full max-w-md shadow-lg mt-0 mb-0 rounded-none min-h-screen">
         <CardContent className="p-6">
           {isScanning ? (
             <QRScanner onScanSuccess={handleScan} />

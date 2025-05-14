@@ -9,6 +9,11 @@ if (rootElement) {
   // Remove any default styles that might add margins
   rootElement.style.margin = "0";
   rootElement.style.padding = "0";
+  document.body.style.margin = "0";
+  document.body.style.padding = "0";
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.margin = "0";
+  document.documentElement.style.padding = "0";
   
   createRoot(rootElement).render(<App />);
 }

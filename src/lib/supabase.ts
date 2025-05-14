@@ -9,7 +9,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Maximum allowed stamp count based on the constraint in the database
 // NOTE: This must match the database constraint value
-const MAX_STAMP_COUNT = 5;
+const MAX_STAMP_COUNT = 10;
 
 // Function to add a QR code scan to the customers table or update stamp count if already exists
 export async function addQrCodeScan(qrCode: string): Promise<{ success: boolean; error?: string; message?: string; maxReached?: boolean; currentCount?: number }> {
