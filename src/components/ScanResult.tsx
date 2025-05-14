@@ -16,23 +16,10 @@ interface ScanResultProps {
 const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampComplete }) => {
   const { toast } = useToast();
   const [isStamping, setIsStamping] = useState(false);
-  const [stampMessage, setStampMessage] = useState<string | null>(null);
-  const [currentStampCount, setCurrentStampCount] = useState<number | null>(null);
   const [maxReached, setMaxReached] = useState(false);
-
-  // Check if the result is a URL
-  const isUrl = (str: string) => {
-    try {
-      new URL(str);
-      return true;
-    } catch {
-      return false;
-    }
-  };
 
   const handleStamp = async () => {
     setIsStamping(true);
-    setStampMessage(null);
     
     try {
       console.log('Sending QR code to be stamped:', result);
@@ -40,17 +27,12 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
       console.log('Stamp response:', response);
       
       if (response.success) {
-        if (response.currentCount) {
-          setCurrentStampCount(response.currentCount);
-        }
-        
         if (response.maxReached) {
           setMaxReached(true);
         }
         
-        // Set the message from the response
+        // Set the message from the response for the toast only
         const message = response.message || "Stempel registriert";
-        setStampMessage(message);
         
         toast({
           title: response.maxReached ? "Stempelkarte Voll" : "Stempel Erfolgreich Hinzugefügt",
@@ -99,34 +81,11 @@ const ScanResult: React.FC<ScanResultProps> = ({ result, isStamped, onStampCompl
                 />
               </div>
             </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">QR-Inhalt:</h3>
-              <div className="p-3 bg-gray-50 rounded-md break-all">
-                {isUrl(result) ? (
-                  <a 
-                    href={result} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline hover:text-blue-800"
-                  >
-                    {result}
-                  </a>
-                ) : (
-                  <p className="text-gray-800">{result}</p>
-                )}
-              </div>
-            </div>
             
-            {stampMessage && (
-              <div className={`${maxReached ? 'bg-amber-50' : 'bg-blue-50'} p-3 rounded-md ${maxReached ? 'text-amber-800' : 'text-blue-800'} text-center font-medium`}>
-                {maxReached && <Award className="h-5 w-5 mx-auto mb-1" />}
-                <div>{stampMessage}</div>
-                {currentStampCount !== null && (
-                  <div className="mt-2 font-bold text-lg">
-                    Aktuelle Stempelanzahl: {currentStampCount}
-                  </div>
-                )}
+            {maxReached && (
+              <div className="bg-amber-50 p-3 rounded-md text-amber-800 text-center font-medium">
+                <Award className="h-5 w-5 mx-auto mb-1" />
+                <div>Stempelkarte ist voll!</div>
               </div>
             )}
             
